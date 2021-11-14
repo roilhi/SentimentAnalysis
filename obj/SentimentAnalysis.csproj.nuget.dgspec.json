@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Roilhi Ibarra\\Documents\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj": {}
+    "C:\\Users\\Roilhi Ibarra\\Documents\\CyberEquipo39\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Roilhi Ibarra\\Documents\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj": {
+    "C:\\Users\\Roilhi Ibarra\\Documents\\CyberEquipo39\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Roilhi Ibarra\\Documents\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj",
+        "projectUniqueName": "C:\\Users\\Roilhi Ibarra\\Documents\\CyberEquipo39\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj",
         "projectName": "SentimentAnalysis",
-        "projectPath": "C:\\Users\\Roilhi Ibarra\\Documents\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj",
+        "projectPath": "C:\\Users\\Roilhi Ibarra\\Documents\\CyberEquipo39\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj",
         "packagesPath": "C:\\Users\\Roilhi Ibarra\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Roilhi Ibarra\\Documents\\SentimentAnalysisCSharp\\obj\\",
+        "outputPath": "C:\\Users\\Roilhi Ibarra\\Documents\\CyberEquipo39\\SentimentAnalysisCSharp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Roilhi Ibarra\\AppData\\Roaming\\NuGet\\NuGet.Config",

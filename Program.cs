@@ -17,7 +17,7 @@ namespace SentimentAnalysis
     class Program
     {
         static readonly string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "yelp_esp.txt");
-        string line;
+        //string line;
         #region Acciones de la clase principal, se lee el ID del usuario
         static void Main()
         {
@@ -25,14 +25,15 @@ namespace SentimentAnalysis
             TrainTestData splitDataView = LoadData(mlContext);
             ITransformer model = BuildAndTrainModel(mlContext, splitDataView.TrainSet);
             Evaluate(mlContext, model, splitDataView.TestSet);
-            Console.WriteLine("Escriba el ID del usuario");
-            string usuario = Console.ReadLine();
-            UseModelWithSingleItem(mlContext, model,usuario);
-           // UseModelWithBatchItems(mlContext, model);
+            //Console.WriteLine("Escriba el ID del usuario");
+            //string usuario = Console.ReadLine();
+            //UserComment comment = new UserComment();
+            UseModelWithSingleItem(mlContext, model);
+            // UseModelWithBatchItems(mlContext, model);
         }
         #endregion
         #region Entrenando y dividiendo el conjunto de datos (80-20)
-        public static TrainTestData LoadData(MLContext mlContext) 
+        public static TrainTestData LoadData(MLContext mlContext)
         {
             IDataView dataView = mlContext.Data.LoadFromTextFile<SentimentData>(_dataPath, hasHeader: false);
             TrainTestData splitDataView = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
@@ -42,42 +43,43 @@ namespace SentimentAnalysis
         public static ITransformer BuildAndTrainModel(MLContext mlContext, IDataView splitTrainSet)
         {
             var estimator = mlContext.Transforms.Text.FeaturizeText(outputColumnName: "Features", inputColumnName: nameof(SentimentData.SentimentText))
-            .Append(mlContext.BinaryClassification.Trainers.SdcaLogisticRegression(labelColumnName: "Label", featureColumnName:"Features"));
-            Console.WriteLine("==========Creando y entrenando el modelo=========");
+            .Append(mlContext.BinaryClassification.Trainers.SdcaLogisticRegression(labelColumnName: "Label", featureColumnName: "Features"));
+            //Console.WriteLine("==========Creando y entrenando el modelo=========");
             var model = estimator.Fit(splitTrainSet);
-            Console.WriteLine("==================Fin del entrenamiento============================");
-            Console.WriteLine();
+            //Console.WriteLine("==================Fin del entrenamiento============================");
+            //Console.WriteLine();
             return model;
         }
         #region Evalúa el modelo entrenado con el 20% de datos o conjunto de prueba
-        public static void Evaluate(MLContext mlContext, ITransformer model, IDataView splitTestSet) 
+        public static void Evaluate(MLContext mlContext, ITransformer model, IDataView splitTestSet)
         {
-            Console.WriteLine("=============Evaluando precisión del modelo y F1 Score==================================");
+            //Console.WriteLine("=============Evaluando precisión del modelo y F1 Score==================================");
             IDataView predictions = model.Transform(splitTestSet);
             CalibratedBinaryClassificationMetrics metrics = mlContext.BinaryClassification.Evaluate(predictions, "Label");
-            Console.WriteLine();
+            /*Console.WriteLine();
             Console.WriteLine("Evaluación de métricas");
             Console.WriteLine("--------------------------------");
             Console.WriteLine($"Precisión (Acc): {metrics.Accuracy:P2}");
             Console.WriteLine($"Auc: {metrics.AreaUnderRocCurve: P2}");
             Console.WriteLine($"F1Score: {metrics.F1Score:P2}");
-            Console.WriteLine(" ==============Fin de la evaluación del modelo ====================");
+            Console.WriteLine(" ==============Fin de la evaluación del modelo ====================");*/
         }
         #endregion
 
         #region Toma un documento de la base de datos MongoDB, lee el comentario, lo pondera, escribe la ponderación y valoración dada por el modelo
-        public static void UseModelWithSingleItem(MLContext mlContext, ITransformer model, string usuario)
-         {
+        public static void UseModelWithSingleItem(MLContext mlContext, ITransformer model)
+        {
             try
             {
                 var settings = MongoClientSettings.FromConnectionString("mongodb+srv://telemine39:gustavoramos@cluster0.yy1mi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
                 var client = new MongoClient(settings);
                 var database = client.GetDatabase("EvenbriteHackaton");
-                var collection = database.GetCollection<BsonDocument>("MueblesAlfonsoMarina");
-                var filter = Builders<BsonDocument>.Filter.Eq("id", usuario);
+                var collection = database.GetCollection<BsonDocument>("evaluaciones");
+                var filter = Builders<BsonDocument>.Filter.Eq("valoracion","");
                 var BsonDoc = collection.Find(filter).FirstOrDefault();
-                string userName = BsonDoc["usuario"].AsString;
+                string usuario = BsonDoc["usuario"].AsString;
                 string inputComment = BsonDoc["comentario"].AsString;
+                var objectID = BsonDoc["_id"].ToString();
                 var act = BsonDoc["actitud"].AsDouble;
                 var rap = BsonDoc["rapidez"].AsDouble;
                 var crea = BsonDoc["creatividad"].AsDouble;
@@ -89,38 +91,45 @@ namespace SentimentAnalysis
                     SentimentText = inputComment
                 };
                 var resultPrediction = predictionFunction.Predict(sampleStatement);
-                Console.WriteLine();
-                Console.WriteLine("================Prediciendo el comentario del usuario =====================");
-                Console.WriteLine();
+                //Console.WriteLine();
+                //Console.WriteLine("================Prediciendo el comentario del usuario =====================");
+                //Console.WriteLine();
                 string predictedValue = (Convert.ToBoolean(resultPrediction.Prediction) ? "Positivo" : "Negativo");
                 string Prob = Convert.ToString(resultPrediction.Probability);
-                ponderacion = ((act + rap + crea + ser) / 4)*Convert.ToDouble(Prob);
+                ponderacion = ((act + rap + crea + ser) / 4) * Convert.ToDouble(Prob);
                 String pondStr = ponderacion.ToString("0.00");
-                UpdateData(usuario, "ponderacion", pondStr);
-                UpdateData(usuario, "valoracion", predictedValue);
-                Console.WriteLine("Usuario: " + userName);
-                Console.WriteLine($"Comentario: {resultPrediction.SentimentText} | Predicción (P/N): {predictedValue} | Positividad: {Prob}");
-                Console.WriteLine("==============Fin de las predicciones ==========");
-             }
+                string stringVal = "{" + '\u0022' + "valoracion"+'\u0022'+":"+'\u0022' +predictedValue + '\u0022';
+                string ponVal = '\u0022' + "ponderacion"+'\u0022' +":"+'\u0022' + pondStr + '\u0022';
+                string posVal = '\u0022' + "positividad" + '\u0022'+":" +'\u0022'+ Prob + '\u0022'+"}";
+                Console.WriteLine(stringVal + "," + ponVal + "," + posVal);
+                //Console.WriteLine("{"+ $"valoracion:{predictedValue}, ponderacion:{pondStr}, positividad:{Prob}"+"}");
+                Console.ReadLine();
+                //UpdateData(objectID, "ponderacion", pondStr);
+                //UpdateData(objectID, "valoracion", predictedValue);
+                //UpdateData(objectID, "positividad", Prob);
+                //Console.WriteLine("Usuario: " + usuario);
+                //Console.WriteLine($"Comentario: {resultPrediction.SentimentText} | Predicción (P/N): {predictedValue} | Positividad: {Prob}");
+                //Console.WriteLine("==============Fin de las predicciones ==========");
+            }
             catch
             {
                 Console.WriteLine("Error, el ID de usuario es incorrecto o no existe");
             }
-       }
+        }
         #endregion
-        #region Actualiza el documento, escribe en los campos valoracion: positivo/negativo y en ponderacion el promedio global
-        static void UpdateData(string id, string field,string valueUp) 
+        /*#region Actualiza el documento, escribe en los campos valoracion: positivo/negativo y en ponderacion el promedio global
+        static void UpdateData(string Oid, string field, string valueUp)
         {
             var settings = MongoClientSettings.FromConnectionString("mongodb+srv://telemine39:gustavoramos@cluster0.yy1mi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
             var client = new MongoClient(settings);
             var database = client.GetDatabase("EvenbriteHackaton");
-            var collection = database.GetCollection<BsonDocument>("MueblesAlfonsoMarina");
-            var myFilter = Builders<BsonDocument>.Filter.Eq("id", id);
+            var collection = database.GetCollection<BsonDocument>("evaluaciones");
+            string OidStr = "ObjectId(" + Oid + ")";
+            var myFilter = Builders<BsonDocument>.Filter.Eq("_id", OidStr);
             var update = Builders<BsonDocument>.Update.Set(field, valueUp);
-            collection.UpdateOne(myFilter,update);
+            collection.UpdateOne(myFilter, update);
         }
-        #endregion
-
+        #endregion */
 
         /*public static void UseModelWithBatchItems(MLContext mlContext, ITransformer model) 
         {

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xMFwW8h7tyQdSmc80iw5SYBz02uEZzyom371Fi2Sz9R8JH/REw/qnA7bf6qgJv1a50rZnfrW5SUR6RoZVxLj7g==",
+  "dgSpecHash": "Mb5Wj9yJf+phmKBwl+zO7bTmruUWZwx4OID9bE5JtJ+rhIioyJVVZrQvMGtfnJw80Py4HdbL/55tXnnI0PWihg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Roilhi Ibarra\\Documents\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj",
+  "projectFilePath": "C:\\Users\\Roilhi Ibarra\\Documents\\CyberEquipo39\\SentimentAnalysisCSharp\\SentimentAnalysis.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Roilhi Ibarra\\.nuget\\packages\\dnsclient\\1.4.0\\dnsclient.1.4.0.nupkg.sha512",
     "C:\\Users\\Roilhi Ibarra\\.nuget\\packages\\microsoft.csharp\\4.3.0\\microsoft.csharp.4.3.0.nupkg.sha512",
